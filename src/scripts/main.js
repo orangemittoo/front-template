@@ -1,3 +1,4 @@
 function b(){
-	var sub = 2;
+	var main = 2;
+	return main;
 }
