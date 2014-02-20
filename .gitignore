@@ -5,3 +5,4 @@ var
 .sass-cache
 src/bower_components
 test/bower_components
+tscommand.tmp.txt

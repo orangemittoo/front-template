@@ -17,7 +17,8 @@ module.exports = function (grunt) {
             dev: 'src',
             dist: 'dist',
             var: 'var',
-            jsPath: 'scripts',
+            jsPath: 'js',
+            tsPath: 'ts',
             stylesPath: 'styles',
             imgPath: 'images',
             cssFiles: 'css',
@@ -25,9 +26,13 @@ module.exports = function (grunt) {
 
         // Watches files for changes and runs tasks based on the changed files
         watch: {
-            js: {
-                files: ['<%= config.dev %>/<%= config.jsPath %>/{,*/}*.js'],
-                tasks: ['']
+            // js: {
+            //     files: ['<%= config.dev %>/<%= config.jsPath %>/{,*/}*.js'],
+            //     tasks: ['']
+            // },
+            ts: {
+                files: ['<%= config.dev %>/<%= config.tsPath %>/{,*/}*.ts'],
+                tasks: ['ts:dev']
             },
             compass: {
                 files: ['<%= config.dev %>/<%= config.stylesPath %>/{,*/}*.{scss,sass}'],
@@ -96,6 +101,21 @@ module.exports = function (grunt) {
                 options: {
                     run: true,
                     urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
+                }
+            }
+        },
+
+        //typescript
+        ts: {
+            dev: {
+                src: ['<%= config.dev %>/<%= config.tsPath %>/{,*/}*.ts'],
+                outDir: '<%= config.var %>/<%= config.jsPath %>',
+                options: {
+                    target: 'es3',
+                    module: 'commonjs',
+                    sourceMap: true,
+                    declaration: false,
+                    removeComments: true
                 }
             }
         },
@@ -282,7 +302,7 @@ module.exports = function (grunt) {
     });
 
 
-    grunt.registerTask('serve', function (target) {
+    grunt.registerTask('serve', function (target, hoge) {
         if (target === 'dist') {
             return grunt.task.run(['build', 'connect:dist:keepalive']);
         }
@@ -295,6 +315,37 @@ module.exports = function (grunt) {
             'watch'
         ]);
     });
+
+    grunt.registerTask('altjs:ts', function (target) {
+        if (target === 'dist') {
+            grunt.task.run([
+                'clean:dist',
+                'useminPrepare',
+                'concurrent:dist',
+                'ts:dev',
+                'autoprefixer',
+                'concat',
+                'cssmin',
+                'uglify',
+                'copy:dist',
+                'modernizr',
+                'rev',
+                'usemin',
+                'htmlmin',
+                'connect:dist:keepalive'
+            ]);
+        }else {
+            grunt.task.run([
+                'clean:server',
+                'concurrent:server',
+                'ts:dev',
+                'autoprefixer',
+                'connect:livereload',
+                'watch'
+            ]);
+        }
+    });
+
 
     grunt.registerTask('test', function(target) {
         if (target !== 'watch') {
